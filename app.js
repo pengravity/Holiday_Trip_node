@@ -1,3 +1,4 @@
+const { json } = require('body-parser');
 const express = require('express');
 const fs = require('fs');
 
@@ -23,6 +24,26 @@ app.get('/api/v1/tours', (req, res) => {
     results: tours.length,
     data: {
       tours,
+    },
+  });
+});
+
+app.get('/api/v1/tours/:id', (req, res) => {
+  const id = Number(req.params.id);
+
+  if (id > tours.length) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'invalid ID',
+    });
+  }
+
+  const tour = tours.find((element) => element.id === id);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tour,
     },
   });
 });
