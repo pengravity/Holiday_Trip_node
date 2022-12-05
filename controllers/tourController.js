@@ -15,6 +15,20 @@ exports.checkID = (req, res, next, val) => {
   next();
 };
 
+// checkBody midleware
+// check if body contains name and price
+// if not send back 400 bad request
+// add it to the post handler stack
+exports.checkBody = (req, res, next) => {
+  if (!req.body.name || !req.body.price) {
+    return res.status(400).json({
+      status: 'fail',
+      message: 'You need to send name and price for the trip',
+    });
+  }
+  next();
+};
+
 // Route handlers
 exports.getAllTours = (req, res) => {
   res.status(200).json({
