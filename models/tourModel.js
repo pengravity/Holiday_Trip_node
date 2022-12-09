@@ -23,8 +23,8 @@ const tourSchema = new mongoose.Schema({
     required: [true, 'Price is required'],
   },
   priceDiscount: Number,
-  ratingAverage: { type: Number, default: 4.0 },
-  ratingQuantity: { type: Number, default: 0 },
+  ratingsAverage: { type: Number, default: 4.0 },
+  ratingsQuantity: { type: Number, default: 0 },
   summary: {
     type: String,
     trim: true,
