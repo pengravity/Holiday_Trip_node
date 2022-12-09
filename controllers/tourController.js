@@ -13,9 +13,33 @@ exports.checkBody = (req, res, next) => {
 // Route handlers
 exports.getAllTours = async (req, res) => {
   try {
-    const tours = await Tour.find();
-    // console.log(tours);
+    // build a query
+    // filtering
+    const queryObj = { ...req.query };
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+    excludedFields.forEach((el) => delete queryObj[el]);
 
+    // advanced filtering
+    // queryObj { difficulty: 'easy', duration: { gte: '5' } }
+    // need to replace gte, gt, lte, lt
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+
+    let query = Tour.find(JSON.parse(queryStr));
+
+    // SORTING
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      query = query.sort(sortBy);
+    } // default sort in case none specified
+    else {
+      query = query.sort('-createdAt');
+    }
+
+    // execute query
+    const tours = await query;
+
+    // send response
     res.status(200).json({
       status: 'success',
       results: tours.length,
