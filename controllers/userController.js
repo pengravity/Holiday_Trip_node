@@ -1,15 +1,24 @@
-const fs = require('fs');
 
-const users = JSON.parse(
-  fs.readFileSync(`${__dirname}/../dev-data/data/tours.json`)
-);
+const User = require('../models/userModel');
+const APIFeatures = require('../utils/apiFeatures');
+const AppError = require('../utils/appError');
+const catchAsync = require('../utils/catchAsync');
 
-exports.getAllUsers = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not yet implemented',
+
+
+exports.getAllUsers = catchAsync( async (req, res, next) => {
+const users = await User.find()
+
+  
+  // send response
+  res.status(200).json({
+    status: 'success',
+    
+    data: {
+      users,
+    },
   });
-};
+});
 
 exports.createUser = (req, res) => {
   res.status(500).json({
