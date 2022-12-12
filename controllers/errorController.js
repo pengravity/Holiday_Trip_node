@@ -5,11 +5,10 @@ const handleCastErrorDB = (err) => {
   return new AppError(message, 400);
 };
 
+// only email set to unique
 const handleDuplicateFieldsDB = (err) => {
-  const value = err.errmsg.match(/(["'])(\\?.)*?\1/)[0];
-  console.log(value);
+  const message = `This email is already in use `;
 
-  const message = `Duplicate field value: ${value}. use another value`;
   return new AppError(message, 400);
 };
 
@@ -51,7 +50,7 @@ const sendErrorProd = (err, res) => {
     // 2) Send generic message
     res.status(500).json({
       status: 'error',
-      message: 'Something went very wrong!',
+      message: 'Something went wrong...',
     });
   }
 };
