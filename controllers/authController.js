@@ -82,3 +82,27 @@ if (decodedUser.changedPasswordAfter(decoded.iat)) {
   req.user = decodedUser;
   next();
  })
+
+ exports.restrictTo = (...roles) => {
+    
+    return (req, res, next) => {
+        // roles is an array in case we want more than admin 
+        if(!roles.includes(req.user.role)) {
+            return next(new AppError('You are not allowed to perform this action', 403))
+        }
+
+        next()
+    }
+ }
+
+ exports.forgotPassword = catchAsync(async (req, res, next) => {
+    // get user based on email that was POST 
+const user = await User.findOne({
+    email: req.body.email
+})
+    // generate random reset token 
+
+    // send it to user email 
+  })
+
+ exports.resetPassword = (req, res, next) => { }

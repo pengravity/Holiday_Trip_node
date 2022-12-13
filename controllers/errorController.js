@@ -12,7 +12,9 @@ const handleDuplicateFieldsDB = (err) => {
   return new AppError(message, 400);
 };
 
+// not starting on validation
 const handleValidationErrorDB = (err) => {
+  console.log('****************', err);
   const errors = Object.values(err.errors).map((el) => el.message);
 
   const message = `Invalid input data. ${errors.join('. ')}`;
@@ -51,6 +53,7 @@ const sendErrorProd = (err, res) => {
     res.status(500).json({
       status: 'error',
       message: 'Something went wrong...',
+      error: err,
     });
   }
 };
@@ -65,11 +68,11 @@ module.exports = (err, req, res, next) => {
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err };
-
+    console.log('xxxxxxxxxx', error);
     if (error.name === 'CastError') error = handleCastErrorDB(error);
     if (error.code === 11000) error = handleDuplicateFieldsDB(error);
-    if (error.name === 'ValidationError')
-      error = handleValidationErrorDB(error);
+    // need check the one below
+    if (error.name === 'ValidatorError') error = handleValidationErrorDB(error);
     if (error.name === 'JsonWebTokenError') error = handleJWTError();
     if (error.name === 'TokenExpiredError') error = handleJWTExpiredError();
 
