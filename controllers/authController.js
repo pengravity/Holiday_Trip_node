@@ -1,10 +1,11 @@
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const sendEmail = require('../utils/email');
-const crypto = require('crypto');
 
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -17,6 +18,18 @@ const signToken = (id) =>
 //   });
 // };
 
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -25,15 +38,16 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordConfirmation: req.body.passwordConfirmation,
   });
 
-  const token = signToken(newUser._id);
+  createSendToken(newUser, 201, res);
+  // const token = signToken(newUser._id);
 
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  // res.status(201).json({
+  //   status: 'success',
+  //   token,
+  //   data: {
+  //     user: newUser,
+  //   },
+  // });
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -51,11 +65,13 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // if all ok, send token to client
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  createSendToken(user, 200, res);
+
+  // const token = signToken(user._id);
+  // res.status(200).json({
+  //   status: 'success',
+  //   token,
+  // });
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -182,9 +198,30 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   // log the user in, send JWT
   // if all ok, send token to client
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  createSendToken(user, 200, res);
+
+  // const token = signToken(user._id);
+  // res.status(200).json({
+  //   status: 'success',
+  //   token,
+  // });
+});
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // get user from collection
+  // const { email, password } = req.body;
+
+  // User.findByIdAndUpdate will NOT work here correctly.
+  const user = await User.findById(req.user.id).select('+password');
+
+  // check if POSTed password is correct
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError('Your current password is not correct', 401));
+  }
+  // if pass correct -> update password
+  user.password = req.body.password;
+  user.passwordConfirmation = req.body.passwordConfirmation;
+  await user.save();
+  // login user , send JWT token
+  createSendToken(user, 200, res);
 });
