@@ -21,6 +21,8 @@ router.patch(
   userController.updateUserData
 );
 
+router.delete('/deleteUser', authController.protect, userController.deleteUser);
+
 // users
 router
   .route('/')

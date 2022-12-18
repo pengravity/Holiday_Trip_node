@@ -50,6 +50,18 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
+});
+
+// regex -> before all stuff with find in the name
+userSchema.pre(/^find/, function (next) {
+  // this is pointing to the current query
+  this.find({ active: { $ne: false } });
+  next();
 });
 
 userSchema.pre('save', async function (next) {
