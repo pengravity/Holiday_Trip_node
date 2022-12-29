@@ -1,5 +1,5 @@
 {
-  "name": "Holidays",
+  "name": "Holiday Trips",
   "version": "1.0.0",
   "description": "node, express, mongoDB app",
   "main": "app.js",
