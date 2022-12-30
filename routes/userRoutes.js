@@ -21,7 +21,13 @@ router.patch(
   userController.updateUserData
 );
 
-router.delete('/deleteUser', authController.protect, userController.deleteUser);
+router.delete(
+  '/deleteOwnUser',
+  authController.protect,
+  userController.deleteOwnUser
+);
+
+router.route('/:id').delete(userController.deleteUser);
 
 // users
 router
