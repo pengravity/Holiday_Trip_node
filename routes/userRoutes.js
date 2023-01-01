@@ -15,10 +15,17 @@ router.patch(
   authController.updatePassword
 );
 
-router.patch(
-  '/updateUserData',
+router.get(
+  '/getOwnUser',
   authController.protect,
-  userController.updateUserData
+  userController.getOwnUser,
+  userController.getUser
+);
+
+router.patch(
+  '/updateOwnUser',
+  authController.protect,
+  userController.updateOwnUser
 );
 
 router.delete(
