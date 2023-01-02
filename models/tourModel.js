@@ -126,6 +126,11 @@ tourSchema.virtual('reviews', {
   localField: '_id',
 });
 
+// tourSchema.index({ price: 1 });
+// compound index
+tourSchema.index({ price: 1, ratingsAverage: -1 });
+tourSchema.index({ slug: 1 });
+
 // mongoose document middleware -> runs before .save() and .create()
 tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
